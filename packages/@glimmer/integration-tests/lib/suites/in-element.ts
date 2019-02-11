@@ -79,10 +79,13 @@ export class InElementSuite extends RenderTest {
     let initialContent = '<p>Hello there!</p>';
     replaceHTML(externalElement, initialContent);
 
-    this.render(stripTight`{{#in-element externalElement}}[{{foo}}]{{/in-element}}`, {
-      externalElement,
-      foo: 'Yippie!',
-    });
+    this.render(
+      stripTight`{{#in-element externalElement insertBefore=null}}[{{foo}}]{{/in-element}}`,
+      {
+        externalElement,
+        foo: 'Yippie!',
+      }
+    );
 
     equalsElement(externalElement, 'div', {}, `${initialContent}[Yippie!]`);
     this.assertHTML('<!---->');
@@ -107,10 +110,44 @@ export class InElementSuite extends RenderTest {
   @test
   'With nextSibling'() {
     let externalElement = this.delegate.createElement('div');
-    replaceHTML(externalElement, '<b>Hello</b><em>there!</em>');
 
     this.render(
       stripTight`{{#in-element externalElement nextSibling=nextSibling}}[{{foo}}]{{/in-element}}`,
+      { externalElement, nextSibling: externalElement.lastChild, foo: 'Yippie!' }
+    );
+
+    equalsElement(externalElement, 'div', {}, '[Yippie!]');
+    this.assertHTML('<!---->');
+    this.assertStableRerender();
+
+    this.rerender({ foo: 'Double Yips!' });
+    equalsElement(externalElement, 'div', {}, '[Double Yips!]');
+    this.assertHTML('<!---->');
+    this.assertStableNodes();
+
+    this.rerender({ nextSibling: null });
+    equalsElement(externalElement, 'div', {}, '[Double Yips!]');
+    this.assertHTML('<!---->');
+    this.assertStableRerender();
+
+    this.rerender({ externalElement: null });
+    equalsElement(externalElement, 'div', {}, '');
+    this.assertHTML('<!---->');
+    this.assertStableRerender();
+
+    this.rerender({ externalElement, nextSibling: externalElement.lastChild, foo: 'Yippie!' });
+    equalsElement(externalElement, 'div', {}, '[Yippie!]');
+    this.assertHTML('<!---->');
+    this.assertStableRerender();
+  }
+
+  @test
+  'With nextSibling (retain content)'() {
+    let externalElement = this.delegate.createElement('div');
+    replaceHTML(externalElement, '<b>Hello</b><em>there!</em>');
+
+    this.render(
+      stripTight`{{#in-element externalElement nextSibling=nextSibling insertBefore=null}}[{{foo}}]{{/in-element}}`,
       { externalElement, nextSibling: externalElement.lastChild, foo: 'Yippie!' }
     );
 

@@ -43,6 +43,7 @@ APPEND_OPCODES.add(Op.OpenDynamicElement, vm => {
 
 APPEND_OPCODES.add(Op.PushRemoteElement, vm => {
   let elementRef = check(vm.stack.pop(), CheckReference);
+  let insertBefore = check(vm.stack.pop(), CheckReference);
   let nextSiblingRef = check(vm.stack.pop(), CheckReference);
   let guidRef = check(vm.stack.pop(), CheckReference);
 
@@ -66,7 +67,9 @@ APPEND_OPCODES.add(Op.PushRemoteElement, vm => {
     vm.updateWith(new Assert(cache));
   }
 
-  let block = vm.elements().pushRemoteElement(element, guid, nextSibling);
+  let shouldClear = insertBefore.value();
+
+  let block = vm.elements().pushRemoteElement(element, guid, nextSibling, shouldClear);
   if (block) vm.associateDestroyable(block);
 });
 

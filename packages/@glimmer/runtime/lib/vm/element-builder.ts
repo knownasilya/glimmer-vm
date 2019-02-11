@@ -205,18 +205,28 @@ export class NewElementBuilder implements ElementBuilder {
   pushRemoteElement(
     element: SimpleElement,
     guid: string,
-    nextSibling: Option<SimpleNode> = null
+    nextSibling: Option<SimpleNode> = null,
+    insertBefore: Option<null>
   ): Option<RemoteLiveBlock> {
-    return this.__pushRemoteElement(element, guid, nextSibling);
+    return this.__pushRemoteElement(element, guid, nextSibling, insertBefore);
   }
 
   __pushRemoteElement(
     element: SimpleElement,
     _guid: string,
-    nextSibling: Option<SimpleNode>
+    nextSibling: Option<SimpleNode>,
+    insertBefore: Option<null>
   ): Option<RemoteLiveBlock> {
     this.pushElement(element, nextSibling);
+
+    if (insertBefore !== null) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+    }
+
     let block = new RemoteLiveBlock(element);
+
     return this.pushLiveBlock(block, true);
   }
 

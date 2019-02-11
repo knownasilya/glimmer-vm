@@ -442,9 +442,18 @@ function addElementModifier(element: Tag<'StartTag'>, mustache: AST.MustacheStat
 
 function addInElementHash(cursor: string, hash: AST.Hash, loc: AST.SourceLocation) {
   let hasNextSibling = false;
+  let hasInsertBefore = false;
   hash.pairs.forEach(pair => {
     if (pair.key === 'guid') {
       throw new SyntaxError('Cannot pass `guid` from user space', loc);
+    }
+
+    if (pair.key === 'insertBefore') {
+      if (pair.value.type !== 'NullLiteral') {
+        throw new SyntaxError('insertBefore only takes `null` as an argument', loc);
+      }
+
+      hasInsertBefore = true;
     }
 
     if (pair.key === 'nextSibling') {
@@ -460,6 +469,12 @@ function addInElementHash(cursor: string, hash: AST.Hash, loc: AST.SourceLocatio
     let nullLiteral = b.literal('NullLiteral', null);
     let nextSibling = b.pair('nextSibling', nullLiteral);
     hash.pairs.push(nextSibling);
+  }
+
+  if (!hasInsertBefore) {
+    let undefinedLiteral = b.literal('UndefinedLiteral', undefined);
+    let beforeSibling = b.pair('insertBefore', undefinedLiteral);
+    hash.pairs.push(beforeSibling);
   }
 
   return hash;

@@ -549,7 +549,7 @@ METADATA[Op.PushRemoteElement] = {
   name: 'PushRemoteElement',
   mnemonic: 'apnd_remotetag',
   before: null,
-  stackChange: -3,
+  stackChange: -4,
   ops: [],
   operands: 0,
   check: true,
